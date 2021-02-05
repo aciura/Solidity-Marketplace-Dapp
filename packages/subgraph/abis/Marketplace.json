@@ -5,7 +5,13 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "owner",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "seller",
         "type": "string"
       },
       {
@@ -13,75 +19,6 @@
         "internalType": "uint64",
         "name": "value",
         "type": "uint64"
-      }
-    ],
-    "name": "AccountCredited",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "buyer",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "seller",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "amount",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "product",
-        "type": "string"
-      }
-    ],
-    "name": "FundsInEscrow",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "seller",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "product",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "price",
-        "type": "uint64"
-      }
-    ],
-    "name": "OfferAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "buyer",
-        "type": "string"
       },
       {
         "indexed": false,
@@ -92,42 +29,11 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "seller",
+        "name": "eventType",
         "type": "string"
       }
     ],
-    "name": "OrderCompleted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "buyer",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "product",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "seller",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "price",
-        "type": "uint64"
-      }
-    ],
-    "name": "ProductOrdered",
+    "name": "Escrow",
     "type": "event"
   },
   {

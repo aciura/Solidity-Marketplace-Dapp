@@ -1,7 +1,6 @@
-// MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = "1bef4b399191434ab4a06b7728c0a510";
 
-//MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
+//TODO: ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
 export const ETHERSCAN_KEY = "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8";
 
 // EXTERNAL CONTRACTS
