@@ -1,7 +1,6 @@
-/*
-    Based on 🏗 scaffold-eth
+/*  Based on 🏗 scaffold-eth
     Code: https://github.com/austintgriffith/scaffold-eth
-    by @austingriffith on twitter or telegram
+    by @austingriffith
 */
 import React, { useCallback, useEffect, useState } from "react";
 import "antd/dist/antd.css";
@@ -12,14 +11,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
 import { formatEther, parseEther } from "@ethersproject/units";
 import styles from "./App.module.css";
-import {
-  useExchangePrice,
-  useGasPrice,
-  useUserProvider,
-  useContractLoader,
-  useContractReader,
-  useBalance,
-} from "./hooks";
+import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useBalance } from "./hooks";
 import { Header, Account, Faucet, Ramp, GasGauge } from "./components";
 import { Transactor } from "./helpers";
 import Marketplace from "./views/Marketplace";
@@ -30,44 +22,40 @@ import { INFURA_ID } from "./constants";
 
 const DEBUG = true;
 
-// 🔭 block explorer URL
-const blockExplorer = "https://etherscan.io/"; // for xdai: "https://blockscout.com/poa/xdai/"
-
+const blockExplorer = "https://etherscan.io/";
 const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
-// ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID)
-console.log("window.location.hostname", window.location.hostname);
-// 🏠 Your local provider is usually pointed at your local blockchain
-const localProviderUrl = "http://" + window.location.hostname + ":8545"; // for xdai: https://dai.poa.network
-// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
+const localProviderUrl = "http://" + window.location.hostname + ":8545";
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
+if (DEBUG) console.log("Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
+const web3Modal = new Web3Modal({
+  // network: "mainnet", // optional
+  cacheProvider: true, // optional
+  providerOptions: {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: INFURA_ID,
+      },
+    },
+  },
+});
 
 function App() {
   const [injectedProvider, setInjectedProvider] = useState();
-  /* 💵 this hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangePrice(mainnetProvider); // 1 for xdai
-
+  const price = useExchangePrice(mainnetProvider);
   /* 🔥 this hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice("fast"); // 1000000000 for xdai
-  // const gasPrice = 10; // gwei for local test-chain
-
+  const gasPrice = useGasPrice("fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
-
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userProvider, gasPrice);
-
   // Faucet Tx can be used to send funds from the faucet
   const faucetTx = Transactor(localProvider, gasPrice);
-
   const yourLocalBalance = useBalance(localProvider, address);
 
   const readContracts = useContractLoader(localProvider);
-  if (DEBUG) console.log("📝 readContracts", readContracts);
-
-  // If you want to make 🔐 write transactions to your contracts, use the userProvider:
   const writeContracts = useContractLoader(userProvider);
 
   const loadWeb3Modal = useCallback(async () => {
@@ -87,14 +75,14 @@ function App() {
     !faucetClicked &&
     localProvider &&
     localProvider._network &&
-    localProvider._network.chainId == 31337 &&
+    localProvider._network.chainId === 31337 &&
     yourLocalBalance &&
     formatEther(yourLocalBalance) <= 0
   ) {
     faucetHint = (
       <div style={{ padding: 16 }}>
         <Button
-          type={"primary"}
+          type="primary"
           onClick={() => {
             faucetTx({
               to: address,
@@ -182,22 +170,6 @@ function App() {
     </div>
   );
 }
-
-/*
-  Web3 modal helps us "connect" external wallets:
-*/
-const web3Modal = new Web3Modal({
-  // network: "mainnet", // optional
-  cacheProvider: true, // optional
-  providerOptions: {
-    walletconnect: {
-      package: WalletConnectProvider, // required
-      options: {
-        infuraId: INFURA_ID,
-      },
-    },
-  },
-});
 
 const logoutOfWeb3Modal = async () => {
   await web3Modal.clearCachedProvider();
