@@ -1,12 +1,13 @@
 # Solidity Marketplace DAPP
  
 My solution is in the smart contract `Marketplace.sol` in `packages/hardhat/contracts`.
+
 Frontend part is in:
 * `App.jsx` in `packages/react-app/src`
 * Transactions parsing is done in  `/react-app/src/views/Marketplace.jsx` 
 * Getting answers for the final 3 questions is in: `packages\react-app\src\views\Answers.jsx`
 
-I based my solution on an DAPP template done by @austingriffith https://github.com/austintgriffith/scaffold-eth
+I based my solution on a DAPP template done by @austingriffith https://github.com/austintgriffith/scaffold-eth
 however the Solidity contract and Marketplace page is my onw work.  
 
 After starting up the project (details below) open http://localhost:3000 to see the web app.
