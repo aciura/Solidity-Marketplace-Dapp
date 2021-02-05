@@ -1,0 +1,12 @@
+.marketplace {
+  display: flex;
+}
+
+.transactions {
+  border: 1px solid #cccccc;
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+  padding: 1rem;
+  text-align: left;
+}

@@ -1,0 +1,334 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "owner",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "value",
+        "type": "uint64"
+      }
+    ],
+    "name": "AccountCredited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "amount",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      }
+    ],
+    "name": "FundsInEscrow",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "name": "OfferAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      }
+    ],
+    "name": "OrderCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "name": "ProductOrdered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "accounts",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "owner",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "value",
+        "type": "uint64"
+      }
+    ],
+    "name": "addCredit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "name": "addOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      }
+    ],
+    "name": "complainOrder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      }
+    ],
+    "name": "completeOrder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "escrow",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "owner",
+        "type": "string"
+      }
+    ],
+    "name": "getCredit",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "offers",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "seller",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "buyer",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "product",
+        "type": "string"
+      }
+    ],
+    "name": "orderProduct",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

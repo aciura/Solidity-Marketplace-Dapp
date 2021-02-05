@@ -1,214 +1,169 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 
-import React, { useState } from "react";
+import React from "react";
 import { Button, List, Divider, Input, Card, DatePicker, Slider, Switch, Progress, Spin } from "antd";
-import { SyncOutlined } from '@ant-design/icons';
-import { Address, Balance } from "../components";
 import { parseEther, formatEther } from "@ethersproject/units";
+import { BigNumber } from "@ethersproject/bignumber";
+import { Address, Balance } from "../components";
+import styles from "./Marketplace.module.css";
 
-export default function ExampleUI({purpose, setPurposeEvents, address, mainnetProvider, userProvider, localProvider, yourLocalBalance, price, tx, readContracts, writeContracts }) {
+// There are 2 decimal places in each 'credit' field
+const CONTRACT_DECIMALS = 100;
+const parseValue = priceString => parseInt(priceString.trim(), 10) * CONTRACT_DECIMALS;
 
-  const [newPurpose, setNewPurpose] = useState("loading...");
+function parseTransaction(row) {
+  const trans = row.split("|");
+  if (trans.length !== 3) throw Error("Incorrect transaction: " + row);
+  const [user, action, args] = trans;
+  return { user: user.trim(), action: action.trim(), args: args.trim() };
+}
+
+export default function ExampleUI({
+  setPurposeEvents,
+  address,
+  mainnetProvider,
+  yourLocalBalance,
+  tx,
+  readContracts,
+  writeContracts,
+}) {
+  const [owner, setOwner] = React.useState(null);
+  const [creditValue, setCreditValue] = React.useState(0);
+  const textareaRef = React.useRef(null);
+
+  async function execute(tr) {
+    const { user, action, args } = tr;
+    switch (action.toUpperCase()) {
+      // Buyer 1 | Credit | 20
+      case "CREDIT": {
+        const value = parseValue(args);
+        return tx(writeContracts.Marketplace.addCredit(user, value));
+      }
+      // Buyer 1 | Order | T-Shirt
+      case "ORDER": {
+        return tx(writeContracts.Marketplace.orderProduct(user, args));
+      }
+      // Seller 2 | Offer | T-Shirt, 5
+      case "OFFER": {
+        const [product, priceStr] = args.split(",");
+        const price = parseValue(priceStr);
+        return tx(writeContracts.Marketplace.addOffer(user, product.trim(), price));
+      }
+      // Buyer 1 | Complete | T-Shirt
+      case "COMPLETE": {
+        return tx(writeContracts.Marketplace.completeOrder(user, args));
+      }
+      // Buyer 2 | Complain | Hoody
+      case "COMPLAIN": {
+        return tx(writeContracts.Marketplace.complainOrder(user, args));
+      }
+      default:
+        throw Error("Unknown transaction type: " + JSON.stringify(tr));
+    }
+  }
+
+  const executeTransactionsInSequence = async transactions => {
+    transactions.reduce((p, tr, index) => {
+      return p.then(async () => {
+        try {
+          console.log(`execute ${index}`, tr);
+          const result = await execute(tr);
+          console.log(`finished execute ${index}`, tr);
+          return result;
+        } catch (error) {
+          console.error(error);
+          return Promise.reject(error);
+        }
+      });
+    }, Promise.resolve());
+  };
+
+  const readAndExecuteTransactions = () => {
+    if (textareaRef && textareaRef.current) {
+      const text = textareaRef.current.value;
+      const rows = text.split(/\r\n|\n\r|\n|\r/);
+      const transactions = rows
+        .map(rowStr => {
+          const row = rowStr.trim();
+          if (row.length < 5) return null;
+          return parseTransaction(row, rowStr);
+        })
+        .filter(tr => tr != null);
+      executeTransactionsInSequence(transactions);
+    }
+  };
 
   return (
-    <div>
-      {/*
-        ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
-      */}
-      <div style={{border:"1px solid #cccccc", padding:16, width:400, margin:"auto",marginTop:64}}>
-        <h2>Example UI:</h2>
+    <div className={styles.marketplace}>
+      <div className={styles.transactions}>
+        <h2>Scan list of transactions</h2>
+        <textarea name="transactions" rows="20" cols="40" ref={textareaRef} />
+        <Button onClick={readAndExecuteTransactions}>Run transactions</Button>
+      </div>
 
-        <h4>purpose: {purpose}</h4>
-
-        <Divider/>
-
-        <div style={{margin:8}}>
-          <Input onChange={(e)=>{setNewPurpose(e.target.value)}} />
-          <Button onClick={()=>{
-            console.log("newPurpose",newPurpose)
-            /* look how you call setPurpose on your contract: */
-            tx( writeContracts.YourContract.setPurpose(newPurpose) )
-          }}>Set Purpose</Button>
+      <div style={{ border: "1px solid #cccccc", padding: "2rem", width: "20rem", marginTop: "1rem" }}>
+        <h2>Manual Marketplace testing:</h2>
+        <h4>Add credits to account</h4>
+        <Divider />
+        <div style={{ margin: 8 }}>
+          <Input onChange={e => setOwner(e.target.value)} placeholder="Account owner" />
+          <Input onChange={e => setCreditValue(e.target.value)} placeholder="Credit value" />
+          <Button
+            onClick={() => {
+              tx(writeContracts.Marketplace.addCredit(owner, creditValue));
+            }}
+          >
+            Add Credit
+          </Button>
         </div>
-
-
         <Divider />
-
         Your Address:
-        <Address
-            value={address}
-            ensProvider={mainnetProvider}
-            fontSize={16}
-        />
-
+        <Address value={address} ensProvider={mainnetProvider} fontSize={16} />
         <Divider />
-
-        ENS Address Example:
+        <h2>Your Balance: {yourLocalBalance ? formatEther(yourLocalBalance) : "..."}</h2>
+        <Divider />
+        Marketplace Contract Address:
         <Address
-          value={"0x34aA3F359A9D614239015126635CE7732c18fDF3"} /* this will show as austingriffith.eth */
+          value={readContracts ? readContracts.Marketplace.address : readContracts}
           ensProvider={mainnetProvider}
           fontSize={16}
         />
-
-        <Divider/>
-
-        {  /* use formatEther to display a BigNumber: */ }
-        <h2>Your Balance: {yourLocalBalance?formatEther(yourLocalBalance):"..."}</h2>
-
-        OR
-
-        <Balance
-          address={address}
-          provider={localProvider}
-          dollarMultiplier={price}
-        />
-
-        <Divider/>
-
-
-        {  /* use formatEther to display a BigNumber: */ }
-        <h2>Your Balance: {yourLocalBalance?formatEther(yourLocalBalance):"..."}</h2>
-
-        <Divider/>
-
-
-
-        Your Contract Address:
-        <Address
-            value={readContracts?readContracts.YourContract.address:readContracts}
-            ensProvider={mainnetProvider}
-            fontSize={16}
-        />
-
         <Divider />
-
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
-            /* look how you call setPurpose on your contract: */
-            tx( writeContracts.YourContract.setPurpose("🍻 Cheers") )
-          }}>Set Purpose to "🍻 Cheers"</Button>
-        </div>
-
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
-            /*
+        <div style={{ margin: 8 }}>
+          <Button
+            onClick={() => {
+              /*
               you can also just craft a transaction and send it to the tx() transactor
               here we are sending value straight to the contract's address:
             */
-            tx({
-              to: writeContracts.YourContract.address,
-              value: parseEther("0.001")
-            });
-            /* this should throw an error about "no fallback nor receive function" until you add it */
-          }}>Send Value</Button>
+              tx({
+                to: writeContracts.Marketplace.address,
+                value: parseEther("0.001"),
+              });
+              /* this should throw an error about "no fallback nor receive function" until you add it */
+            }}
+          >
+            Send Value
+          </Button>
         </div>
-
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
-            /* look how we call setPurpose AND send some value along */
-            tx( writeContracts.YourContract.setPurpose("💵 Paying for this one!",{
-              value: parseEther("0.001")
-            }))
-            /* this will fail until you make the setPurpose function payable */
-          }}>Set Purpose With Value</Button>
-        </div>
-
-
-        <div style={{margin:8}}>
-          <Button onClick={()=>{
-            /* you can also just craft a transaction and send it to the tx() transactor */
-            tx({
-              to: writeContracts.YourContract.address,
-              value: parseEther("0.001"),
-              data: writeContracts.YourContract.interface.encodeFunctionData("setPurpose(string)",["🤓 Whoa so 1337!"])
-            });
-            /* this should throw an error about "no fallback nor receive function" until you add it */
-          }}>Another Example</Button>
-        </div>
-
       </div>
 
-      {/*
-        📑 Maybe display a list of events?
-          (uncomment the event and emit line in YourContract.sol! )
-      */}
-      <div style={{ width:600, margin: "auto", marginTop:32, paddingBottom:32 }}>
+      <div style={{ width: "20rem", marginTop: 32, paddingBottom: 32 }}>
         <h2>Events:</h2>
         <List
           bordered
           dataSource={setPurposeEvents}
-          renderItem={(item) => {
+          renderItem={item => {
+            console.log("event", JSON.stringify(item));
+            const { blockNumber, sender, owner, value } = item;
             return (
-              <List.Item key={item.blockNumber+"_"+item.sender+"_"+item.purpose}>
-                <Address
-                    value={item[0]}
-                    ensProvider={mainnetProvider}
-                    fontSize={16}
-                  /> =>
-                {item[1]}
+              <List.Item key={blockNumber + "_" + sender}>
+                Account credited: {owner} =&gt; {value ? BigNumber.from(value).toString() : ""}
               </List.Item>
-            )
+            );
           }}
         />
       </div>
-
-
-      <div style={{ width:600, margin: "auto", marginTop:32, paddingBottom:256 }}>
-
-        <Card>
-
-          Check out all the <a href="https://github.com/austintgriffith/scaffold-eth/tree/master/packages/react-app/src/components" target="_blank" rel="noopener noreferrer">📦  components</a>
-
-        </Card>
-
-        <Card style={{marginTop:32}}>
-
-          <div>
-            There are tons of generic components included from <a href="https://ant.design/components/overview/" target="_blank" rel="noopener noreferrer">🐜  ant.design</a> too!
-          </div>
-
-          <div style={{marginTop:8}}>
-            <Button type="primary">
-              Buttons
-            </Button>
-          </div>
-
-          <div style={{marginTop:8}}>
-            <SyncOutlined spin />  Icons
-          </div>
-
-          <div style={{marginTop:8}}>
-            Date Pickers?
-            <div style={{marginTop:2}}>
-              <DatePicker onChange={()=>{}}/>
-            </div>
-          </div>
-
-          <div style={{marginTop:32}}>
-            <Slider range defaultValue={[20, 50]} onChange={()=>{}}/>
-          </div>
-
-          <div style={{marginTop:32}}>
-            <Switch defaultChecked onChange={()=>{}} />
-          </div>
-
-          <div style={{marginTop:32}}>
-            <Progress percent={50} status="active" />
-          </div>
-
-          <div style={{marginTop:32}}>
-            <Spin />
-          </div>
-
-
-        </Card>
-
-
-
-
-      </div>
-
-
     </div>
   );
 }
