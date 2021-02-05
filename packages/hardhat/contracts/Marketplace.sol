@@ -70,13 +70,13 @@ contract Marketplace {
     }
 
     function completeOrder(string memory buyer, string memory product) public {
-        Offer storage offer = escrow[buyer][product];
+        Offer memory offer = escrow[buyer][product];
         accounts[offer.seller] += offer.price;
         delete escrow[buyer][product];
     }
 
     function complainOrder(string memory buyer, string memory product) public {
-        Offer storage offer = escrow[buyer][product];
+        Offer memory offer = escrow[buyer][product];
         accounts[buyer] += offer.price;
         delete escrow[buyer][product];
     }
