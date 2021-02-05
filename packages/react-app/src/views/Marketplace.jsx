@@ -18,7 +18,7 @@ function parseTransaction(row) {
   return { user: user.trim(), action: action.trim(), args: args.trim() };
 }
 
-export default function ExampleUI({
+export default function Marketplace({
   setPurposeEvents,
   address,
   mainnetProvider,
