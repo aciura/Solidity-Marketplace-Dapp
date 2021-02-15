@@ -44,33 +44,36 @@ describe("Marketplace Dapp", async () => {
     });
 
     describe("Complete order", () => {
-      it("Should create a new offer, order product and complete order.", async () => {
+      it("Should create a new offer, order product and complete order", async () => {
         const seller = "seller";
         const buyer = "buyer";
         const buyerCredit = 1000;
         const product = "T-Shirt";
         const price = 123;
+        const quantity = 10;
 
         await myContract.addCredit(buyer, buyerCredit);
-        await myContract.addOffer(seller, product, price);
+        await myContract.addOffer(seller, product, price, quantity);
         await myContract.orderProduct(buyer, product);
         await myContract.completeOrder(buyer, product);
 
         expect(await myContract.getCredit(seller)).to.equal(price);
         expect(await myContract.getCredit(buyer)).to.equal(buyerCredit - price);
+        expect(await myContract.getQuantity(product)).to.equal(quantity - 1);
       });
 
-      it("Two sellers sell the same product, only the first seller should get money.", async () => {
+      it("Two sellers sell the same product, only the first seller should get money", async () => {
         const seller = "seller";
         const seller2 = "seller2";
         const buyer = "buyer";
         const buyerCredit = 1000;
         const product = "T-Shirt";
         const price = 123;
+        const quantity = 10;
 
         await myContract.addCredit(buyer, buyerCredit);
-        await myContract.addOffer(seller, product, price);
-        await myContract.addOffer(seller2, product, 321);
+        await myContract.addOffer(seller, product, price, quantity);
+        await myContract.addOffer(seller2, product, 321, 1);
         await myContract.orderProduct(buyer, product);
         await myContract.completeOrder(buyer, product);
 
@@ -87,9 +90,10 @@ describe("Marketplace Dapp", async () => {
         const buyerCredit = 1000;
         const product = "T-Shirt";
         const price = 123;
+        const quantity = 10;
 
         await myContract.addCredit(buyer, buyerCredit);
-        await myContract.addOffer(seller, product, price);
+        await myContract.addOffer(seller, product, price, quantity);
         await myContract.orderProduct(buyer, product);
         await myContract.complainOrder(buyer, product);
 
