@@ -56,11 +56,13 @@
     "chalk": "^4.1.0",
     "eslint": "^7.5.0",
     "eslint-config-airbnb": "^18.2.0",
-    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-babel": "^5.3.1",
-    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
     "ipfs-http-client": "^45.0.0",
-    "prettier": "^2.0.5",
+    "prettier": "^2.2.1",
+    "prettier-eslint-cli": "^5.0.0",
     "s3-folder-upload": "^2.3.1",
     "surge": "^0.21.5"
   },
@@ -76,6 +78,7 @@
     "ipfs": "node ./scripts/ipfs.js",
     "surge": "surge ./build",
     "s3": "node ./scripts/s3.js",
-    "ship": "yarn surge"
+    "ship": "yarn surge",
+    "format": "prettier-eslint --write \"{,!(node_modules)/**/}$PWD/*.{js,jsx}\""
   }
 }
