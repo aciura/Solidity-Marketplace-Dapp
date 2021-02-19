@@ -5,44 +5,12 @@ const { config, ethers } = require('hardhat')
 const { utils } = require('ethers')
 const R = require('ramda')
 
-const deploy = async (
-  contractName,
-  _args = [],
-  overrides = {},
-  libraries = {},
-) => {
-  console.log(` 🛰  Deploying: ${contractName}`)
-
-  const contractArgs = _args || []
-  const contractArtifacts = await ethers.getContractFactory(contractName, {
-    libraries: libraries,
-  })
-  const deployed = await contractArtifacts.deploy(...contractArgs, overrides)
-  const encoded = abiEncodeArgs(deployed, contractArgs)
-  fs.writeFileSync(`artifacts/${contractName}.address`, deployed.address)
-
-  console.log(
-    ' 📄',
-    chalk.cyan(contractName),
-    'deployed to:',
-    chalk.magenta(deployed.address),
-  )
-
-  if (!encoded || encoded.length <= 2) return deployed
-  fs.writeFileSync(`artifacts/${contractName}.args`, encoded.slice(2))
-
-  return deployed
-}
-
 const main = async () => {
   console.log('\n\n 📡 Deploying...\n')
 
   const offersContract = await deploy('Offers')
   const orderContract = await deploy('Order', [offersContract.address])
-  console.log('orderContract', orderContract)
-  // const exampleToken = await deploy("ExampleToken")
-  // const examplePriceOracle = await deploy("ExamplePriceOracle")
-  // const smartContractWallet = await deploy("SmartContractWallet",[exampleToken.address,examplePriceOracle.address])
+  console.log('orderContract', orderContract.address)
 
   /*
   //If you want to send value to an address from the deployer
@@ -76,6 +44,35 @@ const main = async () => {
 }
 
 // ------ utils -------
+
+const deploy = async (
+  contractName,
+  _args = [],
+  overrides = {},
+  libraries = {},
+) => {
+  console.log(` 🛰  Deploying: ${contractName}`)
+
+  const contractArgs = _args || []
+  const contractArtifacts = await ethers.getContractFactory(contractName, {
+    libraries: libraries,
+  })
+  const deployed = await contractArtifacts.deploy(...contractArgs, overrides)
+  const encoded = abiEncodeArgs(deployed, contractArgs)
+  fs.writeFileSync(`artifacts/${contractName}.address`, deployed.address)
+
+  console.log(
+    ' 📄',
+    chalk.cyan(contractName),
+    'deployed to:',
+    chalk.magenta(deployed.address),
+  )
+
+  if (!encoded || encoded.length <= 2) return deployed
+  fs.writeFileSync(`artifacts/${contractName}.args`, encoded.slice(2))
+
+  return deployed
+}
 
 // abi encodes contract arguments
 // useful when you want to manually verify the contracts
