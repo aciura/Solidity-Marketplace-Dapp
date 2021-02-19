@@ -3,7 +3,7 @@ pragma solidity ^0.8.1;
 
 import 'hardhat/console.sol';
 
-contract Credits {
+contract Credit {
   bool private reentrancyLock = false;
   mapping(address => uint256) public credits;
 

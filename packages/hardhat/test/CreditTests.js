@@ -9,13 +9,13 @@ describe('Marketplace Dapp', async () => {
   let myContract
 
   it('Should deploy the contract', async () => {
-    const CreditsContract = await ethers.getContractFactory('Credits')
+    const CreditsContract = await ethers.getContractFactory('Credit')
     myContract = await CreditsContract.deploy()
   })
 
   describe('Marketplace', () => {
     beforeEach(async () => {
-      const CreditsContract = await ethers.getContractFactory('Credits')
+      const CreditsContract = await ethers.getContractFactory('Credit')
       myContract = await CreditsContract.deploy()
     })
 

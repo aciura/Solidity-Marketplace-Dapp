@@ -2,10 +2,10 @@
 pragma solidity ^0.8.1;
 
 import 'hardhat/console.sol';
-import './Credits.sol';
+import './Credit.sol';
 import './IOffers.sol';
 
-contract Order is Credits {
+contract Order is Credit {
   mapping(address => mapping(uint256 => Offer)) public escrow;
 
   IOffers immutable offersContract;
