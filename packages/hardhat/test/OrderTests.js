@@ -74,6 +74,7 @@ describe('Order Contract', async () => {
 
     it('Should revert when buyer does not have enough credit', async () => {
       const offerId = addOffer()
+      // https://stackoverflow.com/questions/45466040/verify-that-an-exception-is-thrown-using-mocha-chai-and-async-await#45496509
       await expect(orderContract.orderProduct(offerId)).to.be.rejectedWith(
         /revert Buyer does not have enough credits/,
       )

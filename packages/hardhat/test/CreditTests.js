@@ -4,6 +4,7 @@ const { solidity } = require('ethereum-waffle')
 const { BigNumber } = require('ethers')
 
 use(solidity)
+use(require('chai-as-promised'))
 
 describe('Marketplace Dapp', async () => {
   let myContract
@@ -62,12 +63,10 @@ describe('Marketplace Dapp', async () => {
         const overrideOptions = { value: valueBN }
         await myContract.connect(addr1).addCredit(overrideOptions)
 
-        myContract
-          .connect(owner)
-          .withdrawCredit(valueBN)
-          .catch(err => {
-            console.log(err.message)
-          })
+        // https://stackoverflow.com/questions/45466040/verify-that-an-exception-is-thrown-using-mocha-chai-and-async-await#45496509
+        await expect(
+          myContract.connect(owner).withdrawCredit(valueBN),
+        ).to.be.rejectedWith(/revert Not enough credits/)
 
         const creditBN = await myContract.getCredit(addr1.address)
         console.log('credit: ', creditBN.toString())
@@ -81,12 +80,11 @@ describe('Marketplace Dapp', async () => {
 
         await myContract.addCredit(overrideOptions)
 
-        const biggerValueBN = ethers.utils.parseEther('1.231')
-        try {
-          await myContract.withdrawCredit(biggerValueBN)
-        } catch (err) {
-          console.log(err.message)
-        }
+        const biggerValueBN = ethers.utils.parseEther('2.46')
+        await expect(
+          myContract.withdrawCredit(biggerValueBN),
+        ).to.be.rejectedWith(/revert Not enough credits/)
+
         const creditBN = await myContract.getCredit(owner.address)
         console.log('credit: ', creditBN.toString())
         expect(creditBN).to.equal(valueBN)
