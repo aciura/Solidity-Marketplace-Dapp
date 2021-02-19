@@ -22,7 +22,10 @@ const defaultNetwork = "localhost";
 
 function mnemonic() {
   try {
-    return fs.readFileSync("./mnemonic.txt").toString().trim();
+    return fs
+      .readFileSync("./mnemonic.txt")
+      .toString()
+      .trim();
   } catch (e) {
     if (defaultNetwork !== "localhost") {
       console.log(
@@ -95,7 +98,7 @@ module.exports = {
     },
   },
   solidity: {
-    version: "0.7.0",
+    version: "0.8.1",
     settings: {
       optimizer: {
         enabled: true,
@@ -280,7 +283,10 @@ task(
   async (_, { ethers }) => {
     const hdkey = require("ethereumjs-wallet/hdkey");
     const bip39 = require("bip39");
-    let mnemonic = fs.readFileSync("./mnemonic.txt").toString().trim();
+    let mnemonic = fs
+      .readFileSync("./mnemonic.txt")
+      .toString()
+      .trim();
     if (DEBUG) console.log("mnemonic", mnemonic);
     const seed = await bip39.mnemonicToSeed(mnemonic);
     if (DEBUG) console.log("seed", seed);
