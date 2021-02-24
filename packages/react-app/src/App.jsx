@@ -2,32 +2,43 @@
     Code: https://github.com/austintgriffith/scaffold-eth
     by @austingriffith
 */
-import React, { useCallback, useEffect, useState } from "react";
-import "antd/dist/antd.css";
-import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import { Row, Col, Button } from "antd";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useUserAddress } from "eth-hooks";
-import { formatEther, parseEther } from "@ethersproject/units";
-import styles from "./App.module.css";
-import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useBalance } from "./hooks";
-import { Header, Account, Faucet, Ramp, GasGauge } from "./components";
-import { Transactor } from "./helpers";
-import Marketplace from "./views/Marketplace";
-import EventsLog from "./views/EventsLog";
-import Answers from "./views/Answers";
+import React, { useCallback, useEffect, useState } from 'react'
+import 'antd/dist/antd.css'
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers'
+import { Row, Col, Button } from 'antd'
+import Web3Modal from 'web3modal'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import { useUserAddress } from 'eth-hooks'
+import { formatEther, parseEther } from '@ethersproject/units'
+import styles from './App.module.css'
+import {
+  useExchangePrice,
+  useGasPrice,
+  useUserProvider,
+  useContractLoader,
+  useBalance,
+} from './hooks'
+import { Header, Account, Faucet, Ramp, GasGauge } from './components'
+import { Transactor } from './helpers'
+import Marketplace from './components/Marketplace'
+import EventsLog from './components/EventsLog'
+import OfferList from './components/OfferList'
+import { useOrderService } from './services/orders.service'
+import { ServiceContext } from './services/ServiceContext'
+import { INFURA_ID } from './constants'
 
-import { INFURA_ID } from "./constants";
+const DEBUG = true
 
-const DEBUG = true;
-
-const blockExplorer = "https://etherscan.io/";
-const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
-const localProviderUrl = "http://" + window.location.hostname + ":8545";
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log("Connecting to provider:", localProviderUrlFromEnv);
-const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
+const blockExplorer = 'https://etherscan.io/'
+const mainnetProvider = new JsonRpcProvider(
+  'https://mainnet.infura.io/v3/' + INFURA_ID,
+)
+const localProviderUrl = 'http://' + window.location.hostname + ':8545'
+const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER
+  ? process.env.REACT_APP_PROVIDER
+  : localProviderUrl
+if (DEBUG) console.log('Connecting to provider:', localProviderUrlFromEnv)
+const localProvider = new JsonRpcProvider(localProviderUrlFromEnv)
 const web3Modal = new Web3Modal({
   // network: "mainnet", // optional
   cacheProvider: true, // optional
@@ -39,38 +50,38 @@ const web3Modal = new Web3Modal({
       },
     },
   },
-});
+})
 
 function App() {
-  const [injectedProvider, setInjectedProvider] = useState();
-  const price = useExchangePrice(mainnetProvider);
-  /* 🔥 this hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice("fast");
-  // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userProvider = useUserProvider(injectedProvider, localProvider);
-  const address = useUserAddress(userProvider);
-  // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userProvider, gasPrice);
+  const [injectedProvider, setInjectedProvider] = useState()
+  const price = useExchangePrice(mainnetProvider)
+  /* price of Gas from ⛽️ EtherGasStation */
+  const gasPrice = useGasPrice('fast')
+  // Use your injected provider from 🦊 Metamask
+  const userProvider = useUserProvider(injectedProvider, localProvider)
+  const address = useUserAddress(userProvider)
+  const tx = Transactor(userProvider, gasPrice)
   // Faucet Tx can be used to send funds from the faucet
-  const faucetTx = Transactor(localProvider, gasPrice);
-  const yourLocalBalance = useBalance(localProvider, address);
+  const faucetTx = Transactor(localProvider, gasPrice)
+  const yourLocalBalance = useBalance(localProvider, address)
 
-  const readContracts = useContractLoader(localProvider);
-  const writeContracts = useContractLoader(userProvider);
+  const readContracts = useContractLoader(localProvider)
+  const writeContracts = useContractLoader(userProvider)
+  const orderService = useOrderService(tx, readContracts, writeContracts)
 
   const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
-    setInjectedProvider(new Web3Provider(provider));
-  }, [setInjectedProvider]);
+    const provider = await web3Modal.connect()
+    setInjectedProvider(new Web3Provider(provider))
+  }, [setInjectedProvider])
 
   useEffect(() => {
     if (web3Modal.cachedProvider) {
-      loadWeb3Modal();
+      loadWeb3Modal()
     }
-  }, [loadWeb3Modal]);
+  }, [loadWeb3Modal])
 
-  let faucetHint = "";
-  const [faucetClicked, setFaucetClicked] = useState(false);
+  let faucetHint = ''
+  const [faucetClicked, setFaucetClicked] = useState(false)
   if (
     !faucetClicked &&
     localProvider &&
@@ -86,29 +97,46 @@ function App() {
           onClick={() => {
             faucetTx({
               to: address,
-              value: parseEther("0.01"),
-            });
-            setFaucetClicked(true);
+              value: parseEther('0.01'),
+            })
+            setFaucetClicked(true)
           }}
         >
           💰 Grab funds from the faucet ⛽️
         </Button>
       </div>
-    );
+    )
   }
 
   return (
     <div className={styles.App}>
       <Header />
 
-      <div className={styles.main}>
-        <Marketplace tx={tx} writeContracts={writeContracts} readContracts={readContracts} />
-        <Answers readContracts={readContracts} localProvider={localProvider} />
-        <EventsLog readContracts={readContracts} localProvider={localProvider} />
-      </div>
+      <ServiceContext.Provider value={{ orderService }}>
+        <div className={styles.main}>
+          <Marketplace address={address} localProvider={localProvider} />
+          <OfferList
+            address={address}
+            readContracts={readContracts}
+            localProvider={localProvider}
+          />
+          <EventsLog
+            readContracts={readContracts}
+            localProvider={localProvider}
+          />
+        </div>
+      </ServiceContext.Provider>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
+      <div
+        style={{
+          position: 'fixed',
+          textAlign: 'right',
+          right: 0,
+          top: 0,
+          padding: 10,
+        }}
+      >
         <Account
           address={address}
           localProvider={localProvider}
@@ -124,19 +152,27 @@ function App() {
       </div>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      <div
+        style={{
+          position: 'fixed',
+          textAlign: 'left',
+          left: 0,
+          bottom: 20,
+          padding: 10,
+        }}
+      >
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} />
           </Col>
 
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
+          <Col span={8} style={{ textAlign: 'center', opacity: 0.8 }}>
             <GasGauge gasPrice={gasPrice} />
           </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+          <Col span={8} style={{ textAlign: 'center', opacity: 1 }}>
             <Button
               onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
+                window.open('https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA')
               }}
               size="large"
               shape="round"
@@ -156,26 +192,31 @@ function App() {
               localProvider &&
               localProvider.connection &&
               localProvider.connection.url &&
-              localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
+              localProvider.connection.url.indexOf(window.location.hostname) >=
+                0 &&
               !process.env.REACT_APP_PROVIDER &&
               price > 1 ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+                <Faucet
+                  localProvider={localProvider}
+                  price={price}
+                  ensProvider={mainnetProvider}
+                />
               ) : (
-                ""
+                ''
               )
             }
           </Col>
         </Row>
       </div>
     </div>
-  );
+  )
 }
 
 const logoutOfWeb3Modal = async () => {
-  await web3Modal.clearCachedProvider();
+  await web3Modal.clearCachedProvider()
   setTimeout(() => {
-    window.location.reload();
-  }, 1);
-};
+    window.location.reload()
+  }, 1)
+}
 
-export default App;
+export default App

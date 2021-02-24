@@ -1,11 +1,12 @@
 .marketplace {
   display: flex;
+  flex-direction: column;
   background-color: rgba(250, 250, 250, 0.3);
   margin: 1rem;
   padding: 1rem;
 }
 
-.transactions {
+.input {
   /* border: 1px solid black; */
   display: flex;
   flex-direction: column;
