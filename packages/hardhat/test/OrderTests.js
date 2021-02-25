@@ -32,6 +32,8 @@ describe('Order Contract', async () => {
 
     const OrderContractFactory = await ethers.getContractFactory('Order')
     orderContract = await OrderContractFactory.deploy(offersContract.address)
+
+    offersContract.setOrderContractAddress(orderContract.address)
   })
 
   describe('Order', () => {
@@ -70,6 +72,30 @@ describe('Order Contract', async () => {
       expect(escrow.seller).to.equal(seller.address)
       expect(escrow.product).to.equal('Tesla S')
       expect(escrow.priceInWei).to.equal(price)
+    })
+
+    it('Should assign buyer to offer after a product order', async () => {
+      const price = ethers.utils.parseEther('50')
+      const offerId = addOffer('Tesla S', price)
+      const valueBN = ethers.utils.parseEther('105.0')
+      await orderContract.connect(buyer).addCredit({ value: valueBN })
+
+      await orderContract.connect(buyer).orderProduct(offerId)
+
+      const offer = await offersContract.getOffer(offerId)
+      expect(offer.buyer).to.equal(buyer.address)
+    })
+
+    it('Should fail when product is ordered twice', async () => {
+      const price = ethers.utils.parseEther('50')
+      const offerId = addOffer('Tesla S', price)
+      const valueBN = ethers.utils.parseEther('205.0')
+      await orderContract.connect(buyer).addCredit({ value: valueBN })
+
+      await orderContract.connect(buyer).orderProduct(offerId)
+      await expect(
+        orderContract.connect(buyer).orderProduct(offerId),
+      ).to.be.rejectedWith(/revert Offer is not available/)
     })
 
     it('Should revert when buyer does not have enough credit', async () => {

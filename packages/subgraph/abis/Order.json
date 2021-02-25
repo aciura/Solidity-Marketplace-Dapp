@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_offersContractAddress",
+        "name": "offersContractAddress",
         "type": "address"
       }
     ],
@@ -24,6 +24,12 @@
         "internalType": "address",
         "name": "seller",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -128,6 +134,11 @@
         "internalType": "uint256",
         "name": "priceInWei",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "buyer",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -183,6 +194,11 @@
             "internalType": "uint256",
             "name": "priceInWei",
             "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "buyer",
+            "type": "address"
           }
         ],
         "internalType": "struct Offer",

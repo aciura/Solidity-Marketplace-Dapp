@@ -8,15 +8,15 @@ import './IOffers.sol';
 contract Order is Credit {
   mapping(address => mapping(uint256 => Offer)) public escrow;
 
-  IOffers immutable offersContract;
+  IOffers immutable _offersContract;
 
-  constructor(address _offersContractAddress) {
-    offersContract = IOffers(_offersContractAddress);
+  constructor(address offersContractAddress) {
+    _offersContract = IOffers(offersContractAddress);
   }
 
   function orderProduct(uint256 offerId) external {
     address buyer = msg.sender;
-    Offer memory offer = offersContract.getOffer(offerId);
+    Offer memory offer = _offersContract.getOffer(offerId);
 
     if (offer.seller != address(0x00)) {
       console.log('orderProduct', buyer, offer.product);
@@ -26,15 +26,17 @@ contract Order is Credit {
         credits[buyer] >= offer.priceInWei,
         'Buyer does not have enough credits'
       );
+      require(offer.buyer == address(0x00), 'Offer is not available');
 
       console.log('Escrow for', offer.product, 'value:', offer.priceInWei);
       credits[buyer] -= offer.priceInWei;
       escrow[buyer][offerId] = offer;
-      //TODO: mark offerId as 'reserved'
+      _offersContract.setBuyerForOffer(offerId, buyer);
 
       emit Escrow(
         buyer,
         offer.seller,
+        offerId,
         offer.priceInWei,
         offer.product,
         'ORDER'
@@ -56,6 +58,7 @@ contract Order is Credit {
     emit Escrow(
       buyer,
       offer.seller,
+      offerId,
       offer.priceInWei,
       offer.product,
       'COMPLETED'
@@ -75,6 +78,7 @@ contract Order is Credit {
     emit Escrow(
       buyer,
       offer.seller,
+      offerId,
       offer.priceInWei,
       offer.product,
       'COMPLAIN'
@@ -93,6 +97,7 @@ contract Order is Credit {
   event Escrow(
     address indexed buyer,
     address indexed seller,
+    uint256 offerId,
     uint256 value,
     string product,
     string eventType

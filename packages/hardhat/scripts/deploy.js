@@ -6,11 +6,13 @@ const { utils } = require('ethers')
 const R = require('ramda')
 
 const main = async () => {
-  console.log('\n\n 📡 Deploying...\n')
+  console.log('\n\n Deploying...\n')
 
   const offersContract = await deploy('Offers')
   const orderContract = await deploy('Order', [offersContract.address])
-  console.log('orderContract', orderContract.address)
+
+  console.log('Set orderContract address', orderContract.address)
+  await offersContract.setOrderContractAddress(orderContract.address)
 
   /*
   //If you want to send value to an address from the deployer
@@ -37,7 +39,7 @@ const main = async () => {
   */
 
   console.log(
-    ' 💾  Artifacts (address, abi, and args) saved to: ',
+    'Artifacts (address, abi, and args) saved to: ',
     chalk.blue('packages/hardhat/artifacts/'),
     '\n\n',
   )

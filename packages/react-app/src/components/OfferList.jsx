@@ -43,13 +43,14 @@ export default function OfferList({ address, readContracts, localProvider }) {
 }
 
 function Offer({ id, offer, orderOffer, completeOrder, complainOrder }) {
-  const { product, priceInWei, seller } = offer
+  const { product, priceInWei, seller, buyer } = offer
 
   return (
     <div key={id.toString()}>
       <span>{product}</span>&nbsp;
       <span>{formatEther(priceInWei)}</span>&nbsp;
-      <span>{seller.toString().substring(0, 8)}...</span>
+      <span>Seller:{seller.toString().substring(0, 8)}...</span>&nbsp;
+      <span>Buyer:{buyer.toString().substring(0, 8)}...</span>
       <button onClick={() => orderOffer(id)}>Order</button>
       <button onClick={() => completeOrder(id)}>Complete</button>
       <button onClick={() => complainOrder(id)}>Complain</button>

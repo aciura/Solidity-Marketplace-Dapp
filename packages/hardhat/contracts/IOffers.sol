@@ -5,6 +5,7 @@ struct Offer {
   address seller;
   string product;
   uint256 priceInWei;
+  address buyer;
 }
 
 interface IOffers {
@@ -15,4 +16,6 @@ interface IOffers {
   function addOffer(string memory product, uint256 priceInWei)
     external
     returns (uint256 offerId);
+
+  function setBuyerForOffer(uint256 offerId, address buyer) external;
 }

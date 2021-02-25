@@ -4,7 +4,7 @@ pragma solidity ^0.8.1;
 import 'hardhat/console.sol';
 
 contract Credit {
-  bool private reentrancyLock = false;
+  bool private _reentrancyLock = false;
   mapping(address => uint256) public credits;
 
   function addCredit() external payable {
@@ -20,11 +20,11 @@ contract Credit {
 
   function withdrawCredit(uint256 value) external {
     require(credits[msg.sender] >= value, 'Not enough credits');
-    require(!reentrancyLock, 're-entrance');
+    require(!_reentrancyLock, 're-entrance');
     credits[msg.sender] -= value;
 
-    reentrancyLock = true;
+    _reentrancyLock = true;
     payable(msg.sender).transfer(value);
-    reentrancyLock = false;
+    _reentrancyLock = false;
   }
 }
