@@ -23,6 +23,7 @@ import { Transactor } from './helpers'
 import Marketplace from './components/Marketplace'
 import EventsLog from './components/EventsLog'
 import OfferList from './components/OfferList'
+import AddOffer from './components/AddOffer'
 import { useOrderService } from './services/orders.service'
 import { ServiceContext } from './services/ServiceContext'
 import { INFURA_ID } from './constants'
@@ -115,16 +116,17 @@ function App() {
       <ServiceContext.Provider value={{ orderService }}>
         <div className={styles.main}>
           <Marketplace address={address} localProvider={localProvider} />
+          <AddOffer />
           <OfferList
             address={address}
             readContracts={readContracts}
             localProvider={localProvider}
           />
-          <EventsLog
-            readContracts={readContracts}
-            localProvider={localProvider}
-          />
         </div>
+        <EventsLog
+          readContracts={readContracts}
+          localProvider={localProvider}
+        />
       </ServiceContext.Provider>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
