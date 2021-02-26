@@ -4,13 +4,13 @@
   background-color: rgba(250, 250, 250, 0.3);
   margin: 1rem;
   padding: 1rem;
+  width: 30vw;
 }
 
 .input {
   /* border: 1px solid black; */
   display: flex;
   flex-direction: column;
-  width: 30vw;
 
   text-align: left;
 }

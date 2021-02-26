@@ -3,6 +3,23 @@
   flex-direction: column;
   padding: 1rem;
   margin: 1rem;
-  width: 20vw;
+  width: 70vw;
   background-color: rgba(250, 250, 250, 0.2);
+}
+
+.offers {
+  table-layout: auto;
+  width: clamp(25rem, 50vw, 100%);
+}
+
+.offers tbody tr {
+  border: rgba(250, 250, 250, 0.4);
+}
+.offers td,
+.offers th {
+  padding: 0.25rem;
+}
+
+.offer {
+  background-color: rgba(250, 250, 250, 0.5);
 }
