@@ -17,6 +17,11 @@ export class OrderService {
     )
   }
 
+  withdrawEth(ethInWei) {
+    console.log('withdraw', ethInWei)
+    return this.tx(this.writeContracts.Order.withdrawCredit(ethInWei))
+  }
+
   getCredit(address) {
     console.log('getCredit', address)
     return this.readContracts?.Order.getCredit(address)
@@ -24,22 +29,36 @@ export class OrderService {
 
   addOffer(productName, ethInWei) {
     console.log('addOffer', productName, ethInWei)
-    return this.writeContracts.Offers.addOffer(productName, ethInWei)
+    return this.tx(this.writeContracts.Offers.addOffer(productName, ethInWei))
   }
 
   orderProduct(offerId) {
     console.log('orderProduct', offerId)
-    return this.writeContracts.Order.orderProduct(offerId)
+    return this.tx(this.writeContracts.Order.orderProduct(offerId))
   }
 
   completeOrder(offerId) {
     console.log('completeOrder', offerId)
-    return this.writeContracts.Order.completeOrder(offerId)
+    return this.tx(this.writeContracts.Order.completeOrder(offerId))
   }
 
   complainOrder(offerId) {
     console.log('complainOrder', offerId)
-    return this.writeContracts.Order.complainOrder(offerId)
+    return this.tx(this.writeContracts.Order.complainOrder(offerId))
+  }
+
+  async getAllOffers() {
+    const offerIds = await this.readContracts?.Offers.getAllOfferIds()
+    console.log('getAllOffers 0', offerIds)
+    const offers = offerIds?.map(async (offerId, i) => {
+      const offer = await this.readContracts?.Offers.getOffer(offerId)
+      console.log('getAllOffers 1 - Offer', i, offer)
+      return { ...offer, id: offerId.toString() }
+    })
+    console.log('getAllOffers 2 - offers', offers)
+    const result = await Promise.all(offers ?? [])
+    console.log('getAllOffers 3 - promised all', result)
+    return result
   }
 }
 
@@ -51,36 +70,6 @@ export const useOrderService = (tx, readContracts, writeContracts) => {
   return orderService
 }
 
-// async function execute(tr) {
-//   const { user, action, args } = tr
-//   switch (action.toUpperCase()) {
-//     // Buyer 1 | Credit | 20
-//     case 'CREDIT': {
-//       const value = parseValue(args)
-//       return tx(writeContracts.Order.addCredit(user, value))
-//     }
-//     // Buyer 1 | Order | T-Shirt
-//     case 'ORDER': {
-//       return tx(writeContracts.Order.orderProduct(user, args))
-//     }
-//     // Seller 2 | Offer | T-Shirt, 5
-//     case 'OFFER': {
-//       const [product, priceStr] = args.split(',')
-//       const price = parseValue(priceStr)
-//       return tx(writeContracts.Offers.addOffer(user, product.trim(), price))
-//     }
-//     // Buyer 1 | Complete | T-Shirt
-//     case 'COMPLETE': {
-//       return tx(writeContracts.Order.completeOrder(user, args))
-//     }
-//     // Buyer 2 | Complain | Hoody
-//     case 'COMPLAIN': {
-//       return tx(writeContracts.Order.complainOrder(user, args))
-//     }
-//     default:
-//       throw Error('Unknown transaction type: ' + JSON.stringify(tr))
-//   }
-// }
 // const executeTransactionsInSequence = async transactions => {
 //   transactions.reduce((p, tr, index) => {
 //     return p.then(async () => {
