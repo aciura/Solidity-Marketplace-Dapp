@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.1;
 
+enum OfferState { New, Ordered, Completed, Complaint }
+
 struct Offer {
   address seller;
   string product;
   uint256 priceInWei;
   address buyer;
+  OfferState state;
 }
 
 interface IOffers {
-  event OfferAdded(uint256 indexed id, Offer offer);
+  event OfferAdded(uint256 indexed offerId, Offer offer);
 
   function getOffer(uint256 id) external view returns (Offer memory offer);
 
@@ -18,4 +21,6 @@ interface IOffers {
     returns (uint256 offerId);
 
   function setBuyerForOffer(uint256 offerId, address buyer) external;
+
+  function setOfferState(uint256 offerId, OfferState state) external;
 }

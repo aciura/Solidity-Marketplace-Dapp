@@ -50,40 +50,49 @@ contract Order is Credit {
     address buyer = msg.sender;
     Offer memory offer = escrow[buyer][offerId];
 
-    console.log('Seller credits before:', credits[offer.seller]);
-    console.log('Move credits to:', offer.seller, 'value:', offer.priceInWei);
-    credits[offer.seller] += offer.priceInWei;
+    if (offer.seller != address(0x00)) {
+      console.log('Seller credits before:', credits[offer.seller]);
+      console.log('Move credits to:', offer.seller, 'value:', offer.priceInWei);
+      credits[offer.seller] += offer.priceInWei;
 
-    delete escrow[buyer][offerId];
-    emit Escrow(
-      buyer,
-      offer.seller,
-      offerId,
-      offer.priceInWei,
-      offer.product,
-      'COMPLETED'
-    );
-    console.log('Seller credits after:', credits[offer.seller]);
+      delete escrow[buyer][offerId];
+
+      _offersContract.setOfferState(offerId, OfferState.Completed);
+      emit Escrow(
+        buyer,
+        offer.seller,
+        offerId,
+        offer.priceInWei,
+        offer.product,
+        'COMPLETED'
+      );
+      console.log('Seller credits after:', credits[offer.seller]);
+    }
   }
 
   function complainOrder(uint256 offerId) external {
     address buyer = msg.sender;
     Offer memory offer = escrow[buyer][offerId];
 
-    console.log('Buyer credits before:', credits[buyer]);
-    console.log('Move credits to:', buyer, 'value:', offer.priceInWei);
-    credits[buyer] += offer.priceInWei;
+    if (offer.seller != address(0x00)) {
+      console.log('Buyer credits before:', credits[buyer]);
+      console.log('Move credits to:', buyer, 'value:', offer.priceInWei);
+      credits[buyer] += offer.priceInWei;
 
-    delete escrow[buyer][offerId];
-    emit Escrow(
-      buyer,
-      offer.seller,
-      offerId,
-      offer.priceInWei,
-      offer.product,
-      'COMPLAIN'
-    );
-    console.log('Buyer credits after:', credits[buyer]);
+      delete escrow[buyer][offerId];
+
+      _offersContract.setOfferState(offerId, OfferState.Complaint);
+
+      emit Escrow(
+        buyer,
+        offer.seller,
+        offerId,
+        offer.priceInWei,
+        offer.product,
+        'COMPLAIN'
+      );
+      console.log('Buyer credits after:', credits[buyer]);
+    }
   }
 
   function getEscrow(address buyer, uint256 offerId)

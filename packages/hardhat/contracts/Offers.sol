@@ -27,17 +27,16 @@ contract Offers is IOffers, Ownable {
       );
     console.log('addOffer', msg.sender, product, priceInWei);
 
-    Offer memory offer = Offer(msg.sender, product, priceInWei, address(0x00));
+    Offer memory offer =
+      Offer(msg.sender, product, priceInWei, address(0x00), OfferState.New);
     _offers[id] = offer;
-    _allOfferIds.push(offerId);
+    _allOfferIds.push(id);
 
     emit OfferAdded(id, offer);
     return id;
   }
 
   function setBuyerForOffer(uint256 offerId, address buyer) external override {
-    console.log('msg.sender=', msg.sender);
-    console.log('orderContract:', _orderContractAddress);
     require(
       msg.sender == _orderContractAddress,
       'Can be only called by OrderContract'
@@ -46,7 +45,21 @@ contract Offers is IOffers, Ownable {
     Offer storage offer = _offers[offerId];
     if (offer.seller != address(0x00)) {
       offer.buyer = buyer;
+      offer.state = OfferState.Ordered;
       console.log('Assigned buyer to offer of:', offer.product);
+    }
+  }
+
+  function setOfferState(uint256 offerId, OfferState state) external override {
+    require(
+      msg.sender == _orderContractAddress,
+      'Can be only called by OrderContract'
+    );
+
+    Offer storage offer = _offers[offerId];
+    if (offer.seller != address(0x00)) {
+      offer.state = state;
+      console.log('Changing offer state to:', uint256(state));
     }
   }
 
@@ -63,7 +76,15 @@ contract Offers is IOffers, Ownable {
     return _allOfferIds.length;
   }
 
-  function getAllOffers() external view returns (uint256[] memory) {
+  function getAllOfferIds() external view returns (uint256[] memory) {
     return _allOfferIds;
+  }
+
+  function getOfferByIndex(uint256 index)
+    external
+    view
+    returns (Offer memory offer)
+  {
+    return _offers[_allOfferIds[index]];
   }
 }
