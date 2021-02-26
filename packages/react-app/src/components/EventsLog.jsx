@@ -7,14 +7,37 @@ const orderByBlockNumberAsc = (e1, e2) => e1.blockNumber - e2.blockNumber
 const CONTRACT_DECIMALS = 100
 
 export default function EventsLog({ readContracts, localProvider }) {
-  const events = useEventListener(
+  // event OfferAdded(uint256 indexed id, Offer offer);
+  // struct Offer {
+  //   address seller;
+  //   string product;
+  //   uint256 priceInWei;
+  //   address buyer;
+  // }
+  const offerAddedEvents = useEventListener(
     readContracts,
     'Offers',
     'OfferAdded',
     localProvider,
     1,
   ).sort(orderByBlockNumberAsc)
-  console.log('Events', events)
+  console.log('EventsLog Events', offerAddedEvents)
+
+  /* event Escrow(
+    address indexed buyer,
+    address indexed seller,
+    uint256 offerId,
+    uint256 value,
+    string product,
+    string eventType
+  );*/
+  const escrowEvents = useEventListener(
+    readContracts,
+    'Order',
+    'Escrow',
+    localProvider,
+    1,
+  ).sort(orderByBlockNumberAsc)
 
   return (
     <div className={styles.events}>
@@ -31,8 +54,8 @@ export default function EventsLog({ readContracts, localProvider }) {
           </tr>
         </thead>
         <tbody>
-          {events &&
-            events.map(event => {
+          {offerAddedEvents &&
+            offerAddedEvents.map(event => {
               // const {
               //   blockNumber,
               //   sender,
@@ -44,7 +67,7 @@ export default function EventsLog({ readContracts, localProvider }) {
               // } = event
 
               return (
-                <tr key={event.id.toString()}>
+                <tr key={event.offerId.toString()}>
                   <td>{event.blockNumber}</td>
                   {/* <td>{event.id.toString()}</td> */}
                   <td>{event.offer.product}</td>

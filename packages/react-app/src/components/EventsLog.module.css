@@ -3,6 +3,6 @@
   flex-direction: column;
   padding: 1rem;
   margin: 1rem;
-  width: 30vw;
+  /* width: 30vw; */
   background-color: rgba(250, 250, 250, 0.2);
 }
