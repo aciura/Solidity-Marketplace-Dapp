@@ -49,15 +49,11 @@ export class OrderService {
 
   async getAllOffers() {
     const offerIds = await this.readContracts?.Offers.getAllOfferIds()
-    console.log('getAllOffers 0', offerIds)
     const offers = offerIds?.map(async (offerId, i) => {
       const offer = await this.readContracts?.Offers.getOffer(offerId)
-      console.log('getAllOffers 1 - Offer', i, offer)
       return { ...offer, id: offerId.toString() }
     })
-    console.log('getAllOffers 2 - offers', offers)
     const result = await Promise.all(offers ?? [])
-    console.log('getAllOffers 3 - promised all', result)
     return result
   }
 }

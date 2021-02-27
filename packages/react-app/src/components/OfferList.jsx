@@ -1,25 +1,32 @@
 import React from 'react'
 import { useEventListener } from '../hooks'
-import { formatEther } from '@ethersproject/units'
 import styles from './OfferList.module.css'
 import { ServiceContext } from '../services/ServiceContext'
-import { BigNumber } from '@ethersproject/bignumber'
+import { Offer } from './Offer'
 
-const orderByBlockNumberAsc = (e1, e2) => e1.blockNumber - e2.blockNumber
+const orderByBlockNumberDesc = (e1, e2) => e2.blockNumber - e1.blockNumber
 
-const OfferState = { New: 0, Ordered: 1, Completed: 2, Complaint: 3 }
+export const OfferState = { New: 0, Ordered: 1, Completed: 2, Complaint: 3 }
 
 export default function OfferList({ readContracts, localProvider }) {
-  const events = useEventListener(
+  const { orderService } = React.useContext(ServiceContext)
+  const [offers, setOffers] = React.useState([])
+
+  const offerAddedEvents = useEventListener(
     readContracts,
     'Offers',
     'OfferAdded',
     localProvider,
     1,
-  ).sort(orderByBlockNumberAsc)
-
-  const { orderService } = React.useContext(ServiceContext)
-  const [offers, setOffers] = React.useState([])
+  )
+  const escrowEvents = useEventListener(
+    readContracts,
+    'Order',
+    'Escrow',
+    localProvider,
+    1,
+  )
+  const events = offerAddedEvents.concat(escrowEvents)
 
   const runAsync = async () => {
     const _offers = await orderService.getAllOffers()
@@ -29,7 +36,7 @@ export default function OfferList({ readContracts, localProvider }) {
 
   React.useEffect(() => {
     runAsync()
-  }, [events])
+  }, [events.length])
 
   const orderOffer = async offerId => {
     await orderService.orderProduct(offerId)
@@ -44,9 +51,9 @@ export default function OfferList({ readContracts, localProvider }) {
 
   console.log('OfferList offers', offers)
   return (
-    <div className={styles.answers}>
+    <div className={styles.offers}>
       <h2>Current offers</h2>
-      <table className={styles.offers}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>Product</th>
@@ -74,7 +81,7 @@ export default function OfferList({ readContracts, localProvider }) {
         </tbody>
       </table>
       <h3>Completed</h3>
-      <table className={styles.offers}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>Product</th>
@@ -93,7 +100,7 @@ export default function OfferList({ readContracts, localProvider }) {
         </tbody>
       </table>
       <h3>Complained</h3>
-      <table className={styles.offers}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>Product</th>
@@ -112,29 +119,5 @@ export default function OfferList({ readContracts, localProvider }) {
         </tbody>
       </table>
     </div>
-  )
-}
-
-function Offer({ id, offer, orderOffer, completeOrder, complainOrder }) {
-  const { product, priceInWei, seller, buyer, state } = offer
-  const isOrdered = !BigNumber.from(buyer).isZero()
-  const isFinal = state > OfferState.Ordered
-  return (
-    <tr className={styles.offer}>
-      <td>{product}</td>
-      <td>Ξ{formatEther(priceInWei ?? 0)}</td>
-      <td>{seller?.toString().substring(0, 8)}...</td>
-      <td>{isOrdered ? `${buyer?.toString().substring(0, 8)}...` : ''}</td>
-      <td>
-        {isFinal ? null : isOrdered ? (
-          <>
-            <button onClick={() => completeOrder(id)}>Complete</button>
-            <button onClick={() => complainOrder(id)}>Complain</button>
-          </>
-        ) : (
-          <button onClick={() => orderOffer(id)}>Order</button>
-        )}
-      </td>
-    </tr>
   )
 }

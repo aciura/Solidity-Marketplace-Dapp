@@ -115,8 +115,10 @@ function App() {
 
       <ServiceContext.Provider value={{ orderService }}>
         <div className={styles.main}>
-          <Marketplace address={address} localProvider={localProvider} />
-          <AddOffer />
+          <div>
+            <Marketplace address={address} localProvider={localProvider} />
+            <AddOffer />
+          </div>
           <OfferList
             address={address}
             readContracts={readContracts}

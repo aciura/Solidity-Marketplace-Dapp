@@ -1,10 +1,10 @@
 import React from 'react'
 import { BigNumber } from '@ethersproject/bignumber'
 import { useEventListener } from '../hooks'
+import { formatEther } from '@ethersproject/units'
 import styles from './EventsLog.module.css'
 
-const orderByBlockNumberAsc = (e1, e2) => e1.blockNumber - e2.blockNumber
-const CONTRACT_DECIMALS = 100
+const orderByBlockNumberDesc = (e1, e2) => e2.blockNumber - e1.blockNumber
 
 export default function EventsLog({ readContracts, localProvider }) {
   // event OfferAdded(uint256 indexed id, Offer offer);
@@ -20,8 +20,8 @@ export default function EventsLog({ readContracts, localProvider }) {
     'OfferAdded',
     localProvider,
     1,
-  ).sort(orderByBlockNumberAsc)
-  console.log('EventsLog Events', offerAddedEvents)
+  )
+  console.log('OfferAdded events', offerAddedEvents)
 
   /* event Escrow(
     address indexed buyer,
@@ -37,7 +37,12 @@ export default function EventsLog({ readContracts, localProvider }) {
     'Escrow',
     localProvider,
     1,
-  ).sort(orderByBlockNumberAsc)
+  )
+  console.log('Escrow events:', escrowEvents)
+
+  const events = offerAddedEvents
+    .concat(escrowEvents)
+    .sort(orderByBlockNumberDesc)
 
   return (
     <div className={styles.events}>
@@ -47,35 +52,31 @@ export default function EventsLog({ readContracts, localProvider }) {
           <tr>
             <th>Block</th>
             <th>Event</th>
-            <th>Buyer</th>
-            <th>Seller</th>
             <th>Product</th>
             <th>Value</th>
+            <th>Seller</th>
+            <th>Buyer</th>
           </tr>
         </thead>
         <tbody>
-          {offerAddedEvents &&
-            offerAddedEvents.map(event => {
-              // const {
-              //   blockNumber,
-              //   sender,
-              //   buyer,
-              //   seller,
-              //   value,
-              //   product,
-              //   eventType,
-              // } = event
+          {events?.map(event => {
+            const value = event.offer?.priceInWei
+              ? formatEther(event.offer?.priceInWei)
+              : event.value
+              ? formatEther(event.value)
+              : ''
 
-              return (
-                <tr key={event.offerId.toString()}>
-                  <td>{event.blockNumber}</td>
-                  {/* <td>{event.id.toString()}</td> */}
-                  <td>{event.offer.product}</td>
-                  <td>{event.offer.priceInWei.toString()}</td>
-                  <td>{event.offer.seller.toString()}</td>
-                </tr>
-              )
-            })}
+            return (
+              <tr key={event.blockNumber + event.offerId.toString()}>
+                <td>{event.blockNumber}</td>
+                <td>{event.eventType ?? 'new offer'}</td>
+                <td>{event.product ?? event.offer?.product}</td>
+                <td>{value}</td>
+                <td>{event?.seller ?? event.offer?.seller.toString()}</td>
+                <td>{event?.seller ?? event.offer?.buyer.toString()}</td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>

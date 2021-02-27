@@ -6,3 +6,10 @@
   /* width: 30vw; */
   background-color: rgba(250, 250, 250, 0.2);
 }
+
+.events table td {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
