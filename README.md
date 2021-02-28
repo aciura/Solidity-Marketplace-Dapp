@@ -1,52 +1,37 @@
-# Solidity Marketplace DAPP
- 
-My solution is in the smart contract `Marketplace.sol` in `packages/hardhat/contracts`.
+# Solidity P2P Marketplace DAPP
+
+Simple Peer-2-Peer marketplace DApp that allows:
+
+- Deposit and withdraw ETH from Smart contract [Credit.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Credit.sol)
+- Adding sell offers for products [Offers.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Offers.sol)
+- Ordering products by buyers [Order.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Order.sol)
+- Making an order creates an escrow account that secures the payment for the product
+- Buyer can complete the purchase when he receives the product, which moves credits from escrow to the seller's account.
+- Buyer can complain the product, which returns money from escrow to the buyer's account.
+
+See all solidity smart contracts in `packages/hardhat/contracts`.
+Blockchain part is using: [hardhat](https://hardhat.org/), @openzeppelin/contracts.
+Smart-contract testing is done in: [tests](https://github.com/aciura/Solidity-Marketplace-Dapp/tree/main/packages/hardhat/test) using ethereum-waffle, chai and ethers/hardhat.
 
 Frontend part is in:
-* `App.jsx` in `packages/react-app/src`
-* Transactions parsing is done in  `/react-app/src/views/Marketplace.jsx` 
-* Getting answers for the final 3 questions is in: `packages\react-app\src\views\Answers.jsx`
 
-I based my solution on a DAPP template done by @austingriffith https://github.com/austintgriffith/scaffold-eth
-however the Solidity contract and Marketplace page is my onw work.  
+- `App.jsx` in `packages/react-app/src`
+- Sending orders to blockchain is done using [Ethers v5](https://docs.ethers.io/v5/)
+
+I've based my solution on a DAPP template done by @austingriffith https://github.com/austintgriffith/scaffold-eth however the Solidity contracts and Marketplace page is my onw work.
 
 After starting up the project (details below) open http://localhost:3000 to see the web app.
 
+TODO:
 ![marketplace UI](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/Marketplace-UI.PNG?raw=true)
 
 ### How to get eth
 
-To run transactions on local blockchain you also need some "fake-ETH", you can charge up your account using *faucet* on the bottom-left of the page. 
+To run transactions on local blockchain you also need some "fake-ETH", you can charge up your account using _faucet_ on the bottom-left of the page.
 
-* copy address by clicking on the `0xFO6E` in the top-right side of the browser window (your address may be different). 
-* paste the address into *faucet* on the bottol-left
-* press the `PLAY` button to fill-up the wallet
-
-### How to run Buyer & Seller transactions in the app
-
-* Copy transactions into the `Scan list of transactions` input box. 
-* Use format as in the problem description:
-
-`
-Buyer 1 | Credit | 20
-
-Buyer 2 | Credit | 40
-
-Seller 1 | Offer | Coffee, 3
-
-Seller 2 | Offer | T-Shirt, 5
-
-Seller 1 | Offer | Tea, 2.5
-
-Seller 1 | Offer | Cake, 3.5 
-`
-
-* Press `Run transactions` button below the input box.
-* Wait untill all transactions are executed in the blockchain, answer will appear in the middle panel. 
-
-If you don't have enough fake-eth some transactions may fail and it will result in an incorrect answer. 
-I would suggest having more then $50 of fake-eth in the wallet. 
-
+- copy address by clicking on the `0xFO6E` in the top-right side of the browser window (your address may be different).
+- paste the address into _faucet_ on the bottol-left
+- press the `PLAY` button to fill-up the wallet
 
 ## How to startup the project
 
@@ -73,7 +58,7 @@ yarn chain
 
 ```
 
-> To deploy `Marketplace.sol` smart-contract, in a third terminal window:
+> To deploy smart-contracts, in a third terminal window:
 
 ```bash
 yarn deploy
