@@ -24,7 +24,6 @@ I've based my solution on a DAPP template done by @austingriffith https://github
 
 After starting up the project (details below) open http://localhost:3000 to see the web app.
 
-TODO:
 ![marketplace UI](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/Marketplace-UI.PNG?raw=true)
 
 ### How to get eth
