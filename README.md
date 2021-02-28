@@ -2,16 +2,18 @@
 
 Simple Peer-2-Peer marketplace DApp that allows:
 
-- Deposit and withdraw ETH from Smart contract [Credit.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Credit.sol)
-- Adding sell offers for products [Offers.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Offers.sol)
-- Ordering products by buyers [Order.sol](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Order.sol)
-- Making an order creates an escrow account that secures the payment for the product
-- Buyer can complete the purchase when he receives the product, which moves credits from escrow to the seller's account.
-- Buyer can complain the product, which returns money from escrow to the buyer's account.
+- Deposit and withdraw ETH from Smart contract [(Credit.sol)](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Credit.sol)
+- Adding sell offers for products [(Offers.sol)](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Offers.sol)
+- Ordering products by buyers [(Order.sol)](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/main/packages/hardhat/contracts/Order.sol)
+- Making an order creates an escrow account that secures the payment for the product [(Order.sol)](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/a544b943a571b071093f3d3287945920ee42ec37/packages/hardhat/contracts/Order.sol#L33)
+- Buyer can complete the purchase when he receives the product, which moves credits from escrow to the seller's account [(Order.completeOrder())](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/a544b943a571b071093f3d3287945920ee42ec37/packages/hardhat/contracts/Order.sol#L49).
+- Buyer can complain the product, which returns money from escrow to the buyer's account [(Order.complaintOrder())](https://github.com/aciura/Solidity-Marketplace-Dapp/blob/a544b943a571b071093f3d3287945920ee42ec37/packages/hardhat/contracts/Order.sol#L73).
 
 See all solidity smart contracts in `packages/hardhat/contracts`.
 Blockchain part is using: [hardhat](https://hardhat.org/), @openzeppelin/contracts.
-Smart-contract testing is done in: [tests](https://github.com/aciura/Solidity-Marketplace-Dapp/tree/main/packages/hardhat/test) using ethereum-waffle, chai and ethers/hardhat.
+
+Smart-contract testing is done in: [tests](https://github.com/aciura/Solidity-Marketplace-Dapp/tree/main/packages/hardhat/test), 
+it's using: chai, ethereum-waffle and ethers/hardhat.
 
 Frontend part is in:
 
